@@ -16,7 +16,6 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	err = db.Ping()
-
 	if err != nil {
 		return nil, err
 	}
@@ -24,11 +23,12 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (app *Application) connectToDB() (*sql.DB, error) {
+func (app *application) connectToDB() (*sql.DB, error) {
 	connection, err := openDB(app.DSN)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Connected to postgres!")
+
+	log.Println("Connected to Postgres!")
 	return connection, nil
 }

@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-const PORT = "8080"
+const port = 8080
 
-type Application struct {
+type application struct {
 	DSN          string
 	Domain       string
 	DB           repository.DatabaseRepo
@@ -24,9 +24,11 @@ type Application struct {
 }
 
 func main() {
-	var app Application
+	// set application config
+	var app application
 
-	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres dbname=movies sslmode=disable timezone=UTC connect_timeout=5", "postgres connection string")
+	// read from command line
+	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres dbname=movies sslmode=disable timezone=UTC connect_timeout=5", "Postgres connection string")
 	flag.StringVar(&app.JWTSecret, "jwt-secret", "verysecret", "signing secret")
 	flag.StringVar(&app.JWTIssuer, "jwt-issuer", "example.com", "signing issuer")
 	flag.StringVar(&app.JWTAudience, "jwt-audience", "example.com", "signing audience")
@@ -34,6 +36,7 @@ func main() {
 	flag.StringVar(&app.Domain, "domain", "example.com", "domain")
 	flag.Parse()
 
+	// connect to the database
 	conn, err := app.connectToDB()
 	if err != nil {
 		log.Fatal(err)
@@ -52,12 +55,10 @@ func main() {
 		CookieDomain:  app.CookieDomain,
 	}
 
-	srv := http.Server{
-		Addr:    fmt.Sprintf(":%s", PORT),
-		Handler: app.Routes(),
-	}
-	fmt.Println("server is listening to port", PORT)
-	err = srv.ListenAndServe()
+	log.Println("Starting application on port", port)
+
+	// start a web server
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), app.routes())
 	if err != nil {
 		log.Fatal(err)
 	}
