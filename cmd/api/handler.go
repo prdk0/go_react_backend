@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -320,6 +321,28 @@ func (app *application) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	resp := JSONResponse{
 		Error:   false,
 		Message: "movie updated",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, resp)
+}
+
+func (app *application) DeleteMovie(w http.ResponseWriter, r *http.Request) {
+	fullUrl := strings.Split(r.URL.String(), "/")
+	id, err := strconv.Atoi(fullUrl[3])
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	err = app.DB.DeleteMovie(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	resp := JSONResponse{
+		Error:   false,
+		Message: "movie deleted",
 	}
 
 	app.writeJSON(w, http.StatusAccepted, resp)
