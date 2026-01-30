@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -327,8 +326,7 @@ func (app *application) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) DeleteMovie(w http.ResponseWriter, r *http.Request) {
-	fullUrl := strings.Split(r.URL.String(), "/")
-	id, err := strconv.Atoi(fullUrl[3])
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -346,4 +344,20 @@ func (app *application) DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.writeJSON(w, http.StatusAccepted, resp)
+}
+
+func (app *application) AllMoviesByGenre(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	movies, err := app.DB.AllMovies(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, movies)
 }
